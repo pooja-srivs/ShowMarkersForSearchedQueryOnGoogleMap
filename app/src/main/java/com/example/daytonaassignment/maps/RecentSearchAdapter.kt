@@ -66,4 +66,4 @@ class TextItemVH(view : View) : RecyclerView.ViewHolder(view){
     }
 }
 
-data class TextListItem(val textRecentPlaces: String)
+data class TextListItem(val textRecentPlaces: String, val latitude : Double = 0.0, val longitude : Double = 0.0)

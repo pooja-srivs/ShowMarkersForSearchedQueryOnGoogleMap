@@ -5,6 +5,7 @@ import com.example.daytonaassignment.data.database.QueryDao
 import com.example.daytonaassignment.data.database.UserPlaces
 import com.example.daytonaassignment.data.remote.sources.DataSource
 import com.example.daytonaassignment.data.remote.sources.SearchDataModel
+import com.example.daytonaassignment.mapmyindia.MapinIndiaModel
 import io.reactivex.Single
 
 class DataRepository(
@@ -14,6 +15,10 @@ class DataRepository(
 ) {
     fun getNearbyPlaceData(location : String, radius : String, type : String) : Single<SearchDataModel> {
         return dataSource.getSearchData(location, radius, type, apiKey)
+    }
+
+    fun getNearbyPlaceDataMapinIndia(location : String) : Single<MapinIndiaModel> {
+        return dataSource.getSearchDataMapinIndia(location)
     }
 
     fun getAllRecentSearchPlacesData() : List<RecentSearch> {

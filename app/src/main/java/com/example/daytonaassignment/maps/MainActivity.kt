@@ -1,6 +1,7 @@
 package com.example.daytonaassignment.maps
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Build
@@ -18,6 +19,7 @@ import androidx.lifecycle.Observer
 import com.example.daytonaassignment.R
 import com.example.daytonaassignment.Utilities
 import com.example.daytonaassignment.data.remote.sources.SearchDataModel
+import com.example.daytonaassignment.mapmyindia.MapinIndiaActivity
 import com.example.daytonaassignment.maps.di.RecentSearchListItem
 import com.example.daytonaassignment.maps.di.UserPlaceAdapter
 import com.google.android.gms.location.*
@@ -79,6 +81,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun setListeners(){
 
+        btn_mapmyindia.setOnClickListener {
+            startActivity(Intent(this, MapinIndiaActivity::class.java))
+        }
         btn_search.setOnClickListener {
             ll_recent_search.visibility = GONE
             et_search_query.text.toString().trim().let { str ->

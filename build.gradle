@@ -18,6 +18,10 @@ allprojects {
     repositories {
         google()
         jcenter()
+
+        maven {
+            url 'https://maven.mapmyindia.com/repository/mapmyindia/'
+        }
     }
 }
 

@@ -103,6 +103,14 @@
        app:layout_constraintEnd_toEndOf="parent"
        android:text="Search"/>
 
+      <Button
+          android:id="@+id/btn_mapmyindia"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          app:layout_constraintTop_toBottomOf="@id/btn_search"
+          app:layout_constraintEnd_toEndOf="parent"
+          android:text="MapmyIndia"/>
+
    </androidx.constraintlayout.widget.ConstraintLayout>
 
    <LinearLayout
