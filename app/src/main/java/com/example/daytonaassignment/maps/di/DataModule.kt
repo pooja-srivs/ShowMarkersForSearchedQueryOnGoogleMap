@@ -5,7 +5,6 @@ import com.example.daytonaassignment.maps.MainActivity
 import com.example.daytonaassignment.maps.MainViewModel
 import com.example.daytonaassignment.data.repository.DataRepository
 import com.mingle.chatapp.movie.vmfactory.MainViewModelFactory
-import com.mingle.chatapp.movie.vmfactory.MapinIndiaModelFactory
 import dagger.Module
 import dagger.Provides
 
@@ -21,6 +20,6 @@ class DataModule {
         .get(MainViewModel::class.java)
 
   /*  @Provides
-    fun provideVM(factory: MapinIndiaModelFactory, activity: MainActivity): MainViewModel = ViewModelProvider(activity, factory).get(MainViewModel::class.java)
+    fun provideVM(factory: MapModelFactory, activity: MainActivity): MainViewModel = ViewModelProvider(activity, factory).get(MainViewModel::class.java)
 */
 }

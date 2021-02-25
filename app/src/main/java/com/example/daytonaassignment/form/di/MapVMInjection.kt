@@ -1,24 +1,26 @@
-package com.example.daytonaassignment.mapmyindia.di
+package com.example.daytonaassignment.form.di
 
 import androidx.lifecycle.ViewModelProviders
 import com.example.daytonaassignment.data.repository.DataRepository
+import com.example.daytonaassignment.form.FormActivity
+import com.example.daytonaassignment.form.MapFragment
+import com.example.daytonaassignment.form.MapVM
 import com.example.daytonaassignment.mapmyindia.MapinIndiaActivity
 import com.example.daytonaassignment.mapmyindia.MapinIndiaVM
 import com.mingle.chatapp.movie.vmfactory.MapModelFactory
-import com.mingle.chatapp.movie.vmfactory.MapinIndiaModelFactory
 import dagger.Module
 import dagger.Provides
 
 @Module
-class VMInjection {
+class MapVMInjection {
 
     @Provides
-    fun providesMapmyIndiaViewModelFactory(movieDataRepository: DataRepository) = MapinIndiaModelFactory(movieDataRepository)
+    fun providesMapViewModelFactory(movieDataRepository: DataRepository) = MapModelFactory(movieDataRepository)
 
     @Provides
-    fun providesMapmyIndiaViewModel(factory: MapinIndiaModelFactory, activity: MapinIndiaActivity) : MapinIndiaVM = ViewModelProviders
+    fun providesMapViewModel(factory: MapModelFactory, activity: FormActivity) : MapVM = ViewModelProviders
         .of(activity, factory)
-        .get(MapinIndiaVM::class.java)
+        .get(MapVM::class.java)
 
   /*  @Provides
     fun provideVM(factory: MapModelFactory, activity: MainActivity): MainViewModel = ViewModelProvider(activity, factory).get(MainViewModel::class.java)

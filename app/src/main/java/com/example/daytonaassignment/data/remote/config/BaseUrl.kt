@@ -3,7 +3,7 @@ package com.example.daytonaassignment.data.remote.config
 object BaseUrl {
 
     //map my india url
-    val base_url = "https://atlas.mapmyindia.com/api/places/search/"
+    val base_url = "https://atlas.mapmyindia.com/api/places/textsearch/"
 
     //google maps url
   //  val base_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/"
