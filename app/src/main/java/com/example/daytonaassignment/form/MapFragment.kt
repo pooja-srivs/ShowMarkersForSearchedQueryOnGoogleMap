@@ -1,21 +1,21 @@
-import com.example.daytonaassignment.mapmyindia.MapinIndiaVM
+package com.example.daytonaassignment.form
 
-
-import android.content.Intent
-import android.location.Location
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.example.daytonaassignment.R
 import com.example.daytonaassignment.Utilities
+import com.example.daytonaassignment.mapmyindia.MapinIndiaVM
 import com.example.daytonaassignment.maps.RecentSearchAdapter
 import com.example.daytonaassignment.maps.TextListItem
-import com.mapbox.android.core.location.LocationEngineListener
-import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -31,148 +31,74 @@ import com.mmi.services.api.PlaceResponse
 import com.mmi.services.api.autosuggest.model.AutoSuggestAtlasResponse
 import com.mmi.services.api.reversegeocode.MapmyIndiaReverseGeoCode
 import com.mmi.services.api.textsearch.MapmyIndiaTextSearch
-import dagger.android.AndroidInjection
-import kotlinx.android.synthetic.main.activity_mapin_india.*
+import kotlinx.android.synthetic.main.activity_mapin_india.btn_mipsearch
 import kotlinx.android.synthetic.main.activity_mapin_india.et_search_query
+import kotlinx.android.synthetic.main.activity_mapin_india.rv_recent_mip_search_list
+import kotlinx.android.synthetic.main.fragment_map.*
+import kotlinx.android.synthetic.main.fragment_map.view.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import javax.inject.Inject
 
-class MapinIndiaActivity : AppCompatActivity(), OnMapReadyCallback, LocationEngineListener {
+
+class MapFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var mapview: MapView
     private var mapboxMap: MapboxMap? = null
     private var symbolManager: SymbolManager? = null
-
-    @Inject
-    lateinit var viewModel: MapinIndiaVM
     private lateinit var recentSearchAdapter : RecentSearchAdapter
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_mapin_india)
+    private var listener : MapListener? = null
+//    @Inject
+//    lateinit var viewModel: MapVM
 
-        mapview = findViewById(R.id.mapView)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_map, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    //    AndroidInjection.inject(requireActivity())
+        super.onViewCreated(view, savedInstanceState)
+
+//        viewModel = ViewModelProvider(this)
+//            .get(MapVM::class.java)
+
+        mapview = view.mapView
         mapview.onCreate(savedInstanceState)
         mapview.getMapAsync(this)
 
-        listeners()
-
-        addObserver()
-
         setUpRecentSearchAdapter()
 
-    }
-
-    private fun setUpRecentSearchAdapter(){
-        val onSearchItemClick = { position: Int ->
-            val searchItem = recentSearchAdapter.getItemAt(position)
-            if (searchItem != null){
-                rv_recent_mip_search_list.visibility = View.GONE
-                et_search_query.setText(searchItem.textRecentPlaces)
-                Utilities.hideKeyboard(this, et_search_query)
-           //     viewModel.getNearbyPlaces(searchItem.textRecentPlaces)
-                setMarkerOnMap(searchItem.latitude as Double, searchItem.longitude as Double)
-                initMarker(searchItem.latitude, searchItem.longitude)
-            }else{
-                Toast.makeText(this, "Error occured !", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        //set adapter for recent place recyclerview
-        rv_recent_mip_search_list.adapter = RecentSearchAdapter.newInstance(onSearchItemClick).also {
-            recentSearchAdapter = it
-        }
-    }
-
-    private fun setMarkerOnMap(latitude: Double, longitude: Double){
-
-        mapboxMap?.clear()
-        val cameraPosition = CameraPosition.Builder()
-            .target(LatLng(latitude, longitude))
-            .zoom(14.0)
-            .tilt(0.0)
-            .build()
-        mapboxMap?.cameraPosition = cameraPosition
-
-        mapboxMap?.addMarker(MarkerOptions().position(LatLng(latitude, longitude)))
-
-    }
-
-    private fun showRecentPlaces(recentPlaceList: List<TextListItem>) {
-
-        if (recentPlaceList.isNotEmpty()) {
-            rv_recent_mip_search_list.visibility = View.VISIBLE
-            recentSearchAdapter.submitList(recentPlaceList)
-        }
-    }
-
-    fun listeners(){
-
-        ll_header.setOnClickListener {
-            finish()
-        }
-
-
-        btn_done.setOnClickListener {
-            val intent = Intent()
-            intent.putExtra("address", ""+et_search_query.text.toString().trim())
-            setResult(102, intent)
-            finish()
-        }
-
         btn_mipsearch.setOnClickListener {
-            //either call the MapMyIndia Builder, which internally uses the Retrofit
             callTextSearchApi(et_search_query.text.toString().trim())
-            Utilities.hideKeyboard(this, et_search_query)
-
-            //or hit the auto suggest api directly
-            //     viewModel.getNearbyPlaces(et_search_query.text.toString().trim())
-            Log.d("*** On Click = ", "search button click")
         }
+
+        addObserver()
     }
 
-    fun addObserver(){
+    private fun addObserver(){
 
-        viewModel.placesLiveData.observe(this, Observer { places ->
-
-            val recentPlaces = places.suggestedLocations?.map {
-                TextListItem(
-                    textRecentPlaces = it.placeName,
-                    longitude = it.longitude,
-                    latitude = it.latitude
-                )
-            }
-            showRecentPlaces(recentPlaces)
-
-        })
-
-        viewModel.isLoading.observe(this, Observer {
-            if (it) {
-                mmi_progress.visibility = View.VISIBLE
-            } else {
-                mmi_progress.visibility = View.GONE
-            }
-        })
+//        viewModel.placesLiveData.observe(requireActivity(), Observer {
+//            Log.d("*** MapFragment = ", ""+it)
+//        })
     }
-
-    override fun onMapReady(mapboxMap: MapboxMap?) {
-        this.mapboxMap = mapboxMap
+    override fun onMapReady(mapbox: MapboxMap?) {
+        this.mapboxMap = mapbox
         val cameraPosition = CameraPosition.Builder()
-        //    .target(LatLng(28.4595, 77.0266))
-            .target(LatLng(26.8467, 80.92313))
+            .target(LatLng(28.4595, 77.0266))
             .zoom(14.0)
             .tilt(0.0)
             .build()
         mapboxMap?.cameraPosition = cameraPosition
 
-        mapboxMap?.clear()
         mapboxMap?.addMarker(MarkerOptions().position(LatLng(28.4595, 77.0266)))
 
-    //    initMarker(28.4595, 77.0266)
-        initMarker(26.8467, 80.92313)
+        initMarker(28.4595, 77.0266)
 
     }
 
@@ -184,7 +110,7 @@ class MapinIndiaActivity : AppCompatActivity(), OnMapReadyCallback, LocationEngi
             .icon(
                 BitmapUtils.getBitmapFromDrawable(
                     ContextCompat.getDrawable(
-                        this,
+                        requireActivity(),
                         R.drawable.marker
                     )
                 )
@@ -207,7 +133,7 @@ class MapinIndiaActivity : AppCompatActivity(), OnMapReadyCallback, LocationEngi
             override fun onAnnotationDragFinished(symbol: Symbol?) {
                 reverseGeocode(symbol?.position?.latitude, symbol?.position?.longitude)
                 Toast.makeText(
-                    this@MapinIndiaActivity,
+                    requireContext(),
                     "Lattitude = ${symbol?.position?.latitude} Longitude = ${symbol?.position?.longitude}",
                     Toast.LENGTH_SHORT
                 ).show()
@@ -219,7 +145,7 @@ class MapinIndiaActivity : AppCompatActivity(), OnMapReadyCallback, LocationEngi
     }
 
     private fun reverseGeocode(latitude: Double?, longitude: Double?) {
-        viewModel.isLoading.postValue(true)
+   //     viewModel.isLoading.postValue(true)
         MapmyIndiaReverseGeoCode.builder()
             .setLocation(latitude!!, longitude!!)
             .build().enqueueCall(object : Callback<PlaceResponse> {
@@ -232,80 +158,80 @@ class MapinIndiaActivity : AppCompatActivity(), OnMapReadyCallback, LocationEngi
                             val placesList = response.body()!!.places
                             val place = placesList[0]
                             val add = place.formattedAddress
-                            Toast.makeText(this@MapinIndiaActivity, add, Toast.LENGTH_LONG).show()
+                            Toast.makeText(requireActivity(), add, Toast.LENGTH_LONG).show()
                             //set address to edittext
                             et_search_query.setText("")
                             et_search_query.setText(place.formattedAddress)
+
+                     //       viewModel.placesLiveData.value = place.formattedAddress
+
+                            listener?.selectedPlace(place.formattedAddress)
+
                         } else {
                             Toast.makeText(
-                                this@MapinIndiaActivity,
+                                requireActivity(),
                                 "Not able to get value, Try again.",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
                     } else {
                         Toast.makeText(
-                            this@MapinIndiaActivity,
+                            requireActivity(),
                             response.message(),
                             Toast.LENGTH_LONG
                         ).show()
                     }
 
-                    viewModel.isLoading.postValue(false)
+            //        viewModel.isLoading.postValue(false)
                 }
 
                 override fun onFailure(call: Call<PlaceResponse>, t: Throwable) {
-                    viewModel.isLoading.postValue(false)
-                    Toast.makeText(this@MapinIndiaActivity, t.toString(), Toast.LENGTH_LONG).show()
+            //        viewModel.isLoading.postValue(false)
+                    Toast.makeText(requireActivity(), t.toString(), Toast.LENGTH_LONG).show()
                 }
             })
     }
 
     override fun onMapError(p0: Int, p1: String?) {
+        TODO("Not yet implemented")
     }
 
-    override fun onStart() {
-        super.onStart()
-        mapview.onStart()
+    private fun setUpRecentSearchAdapter(){
+        val onSearchItemClick = { position: Int ->
+            val searchItem = recentSearchAdapter.getItemAt(position)
+            if (searchItem != null){
+                rv_recent_mip_search_list.visibility = View.GONE
+                et_search_query.setText(searchItem.textRecentPlaces)
+            //    viewModel.placesLiveData.value = searchItem.textRecentPlaces
+                listener?.selectedPlace(searchItem.textRecentPlaces)
+
+                Utilities.hideKeyboard(requireActivity(), et_search_query)
+                //     viewModel.getNearbyPlaces(searchItem.textRecentPlaces)
+                setMarkerOnMap(searchItem.latitude, searchItem.longitude)
+                initMarker(searchItem.latitude, searchItem.longitude)
+            }else{
+                Toast.makeText(requireActivity(), "Error occured !", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        //set adapter for recent place recyclerview
+        rv_recent_mip_search_list.adapter = RecentSearchAdapter.newInstance(onSearchItemClick).also {
+            recentSearchAdapter = it
+        }
     }
 
-    override fun onResume() {
-        super.onResume()
-        mapview.onResume()
+    private fun setMarkerOnMap(latitude: Double, longitude: Double){
+
+        val cameraPosition = CameraPosition.Builder()
+            .target(LatLng(latitude, longitude))
+            .zoom(14.0)
+            .tilt(0.0)
+            .build()
+        mapboxMap?.cameraPosition = cameraPosition
+
+        mapboxMap?.addMarker(MarkerOptions().position(LatLng(latitude, longitude)))
     }
 
-    override fun onStop() {
-        super.onStop()
-        mapview.onStop()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        mapview.onPause()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mapview.onDestroy()
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-        mapview.onLowMemory()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        mapview.onSaveInstanceState(outState)
-    }
-
-    override fun onConnected() {
-        Log.d("*** onConnected = ", "true")
-    }
-
-    override fun onLocationChanged(location: Location?) {
-        Log.d("*** onConnected = ", "lat = " + location?.latitude + " lon = " + location?.longitude)
-    }
 
     private fun callTextSearchApi(searchString: String) {
         MapmyIndiaTextSearch.builder()
@@ -327,7 +253,7 @@ class MapinIndiaActivity : AppCompatActivity(), OnMapReadyCallback, LocationEngi
                                 showRecentPlaces(recentPlaces?: arrayListOf())
                             }
                         } else {
-                            Toast.makeText(this@MapinIndiaActivity, "Not able to get value, Try again.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(requireActivity(), "Not able to get value, Try again.", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }
@@ -338,8 +264,33 @@ class MapinIndiaActivity : AppCompatActivity(), OnMapReadyCallback, LocationEngi
     }
 
     fun showToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireActivity(), message, Toast.LENGTH_SHORT).show()
     }
 
+    private fun showRecentPlaces(recentPlaceList: List<TextListItem>) {
 
+        if (recentPlaceList.isNotEmpty()) {
+            rv_recent_mip_search_list.visibility = View.VISIBLE
+            recentSearchAdapter.submitList(recentPlaceList)
+        }
+    }
+
+    interface MapListener{
+        fun selectedPlace(location : String)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        if ( context is MapListener){
+            listener = context
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        if (listener != null){
+            listener = null
+        }
+    }
 }
