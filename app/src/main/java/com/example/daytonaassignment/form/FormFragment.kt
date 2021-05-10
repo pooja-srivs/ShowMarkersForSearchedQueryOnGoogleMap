@@ -6,12 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import com.example.daytonaassignment.R
-import com.example.daytonaassignment.mapmyindia.MapinIndiaVM
-import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.fragment_form.*
 import javax.inject.Inject
 

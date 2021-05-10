@@ -1,10 +1,9 @@
-package com.example.daytonaassignment.mapmyindia.di
+package com.example.daytonaassignment.mapBuilder.di
 
 import androidx.lifecycle.ViewModelProviders
 import com.example.daytonaassignment.data.repository.DataRepository
-import com.example.daytonaassignment.mapmyindia.MapinIndiaActivity
-import com.example.daytonaassignment.mapmyindia.MapinIndiaVM
-import com.mingle.chatapp.movie.vmfactory.MapModelFactory
+import com.example.daytonaassignment.mapBuilder.MapinIndiaActivity
+import com.example.daytonaassignment.mapBuilder.MapinIndiaVM
 import com.mingle.chatapp.movie.vmfactory.MapinIndiaModelFactory
 import dagger.Module
 import dagger.Provides

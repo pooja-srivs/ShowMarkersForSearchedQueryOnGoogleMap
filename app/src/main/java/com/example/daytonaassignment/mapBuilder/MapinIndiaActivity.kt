@@ -1,7 +1,8 @@
-import com.example.daytonaassignment.mapmyindia.MapinIndiaVM
+package com.example.daytonaassignment.mapBuilder
 
 
 import android.content.Intent
+import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
@@ -15,10 +16,13 @@ import com.example.daytonaassignment.Utilities
 import com.example.daytonaassignment.maps.RecentSearchAdapter
 import com.example.daytonaassignment.maps.TextListItem
 import com.mapbox.android.core.location.LocationEngineListener
-import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
+import com.mapbox.mapboxsdk.annotations.Polygon
+import com.mapbox.mapboxsdk.annotations.PolygonOptions
 import com.mapbox.mapboxsdk.camera.CameraPosition
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
@@ -32,11 +36,14 @@ import com.mmi.services.api.autosuggest.model.AutoSuggestAtlasResponse
 import com.mmi.services.api.reversegeocode.MapmyIndiaReverseGeoCode
 import com.mmi.services.api.textsearch.MapmyIndiaTextSearch
 import dagger.android.AndroidInjection
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_mapin_india.*
 import kotlinx.android.synthetic.main.activity_mapin_india.et_search_query
+import kotlinx.android.synthetic.main.activity_mapin_india.ll_header
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.*
 import javax.inject.Inject
 
 class MapinIndiaActivity : AppCompatActivity(), OnMapReadyCallback, LocationEngineListener {
@@ -44,6 +51,9 @@ class MapinIndiaActivity : AppCompatActivity(), OnMapReadyCallback, LocationEngi
     private lateinit var mapview: MapView
     private var mapboxMap: MapboxMap? = null
     private var symbolManager: SymbolManager? = null
+    private val listOfLatlang = ArrayList<LatLng>()
+    private val listOfLatlang2 = ArrayList<LatLng>()
+    private var polygon : Polygon? = null
 
     @Inject
     lateinit var viewModel: MapinIndiaVM
@@ -66,6 +76,24 @@ class MapinIndiaActivity : AppCompatActivity(), OnMapReadyCallback, LocationEngi
 
     }
 
+    private fun setPolygon(listOfLatlang: ArrayList<LatLng>) {
+        mapboxMap?.setPadding(20, 20, 20, 20)
+        /* this is done for move camera focus to particular position */
+
+        /* this is done for move camera focus to particular position */
+        val latLngBounds = LatLngBounds.Builder().includes(listOfLatlang).build()
+        mapboxMap?.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 70))
+
+        polygon = mapboxMap?.addPolygon(
+            PolygonOptions().addAll(this.listOfLatlang)
+                .fillColor(
+                Color.parseColor("#753bb2d0")
+            )
+        )
+        polygon?.id = 300
+
+    }
+
     private fun setUpRecentSearchAdapter(){
         val onSearchItemClick = { position: Int ->
             val searchItem = recentSearchAdapter.getItemAt(position)
@@ -74,6 +102,7 @@ class MapinIndiaActivity : AppCompatActivity(), OnMapReadyCallback, LocationEngi
                 et_search_query.setText(searchItem.textRecentPlaces)
                 Utilities.hideKeyboard(this, et_search_query)
            //     viewModel.getNearbyPlaces(searchItem.textRecentPlaces)
+                Log.d("*** MapMyIndiaAct >>>> ${searchItem.latitude} ${searchItem.longitude}", "")
                 setMarkerOnMap(searchItem.latitude as Double, searchItem.longitude as Double)
                 initMarker(searchItem.latitude, searchItem.longitude)
             }else{
@@ -90,6 +119,7 @@ class MapinIndiaActivity : AppCompatActivity(), OnMapReadyCallback, LocationEngi
     private fun setMarkerOnMap(latitude: Double, longitude: Double){
 
         mapboxMap?.clear()
+        mapboxMap?.removeAnnotations()
         val cameraPosition = CameraPosition.Builder()
             .target(LatLng(latitude, longitude))
             .zoom(14.0)
@@ -111,6 +141,14 @@ class MapinIndiaActivity : AppCompatActivity(), OnMapReadyCallback, LocationEngi
 
     fun listeners(){
 
+      /*  btn_placeAutocomplete.setOnClickListener {
+            val placeAutocompleteActivity: Intent = PlaceAutocomplete.IntentBuilder()
+                //      .placeOptions(placeOptions)
+                .build(this)
+            startActivityForResult(placeAutocompleteActivity, 102)
+        }
+*/
+
         ll_header.setOnClickListener {
             finish()
         }
@@ -118,7 +156,7 @@ class MapinIndiaActivity : AppCompatActivity(), OnMapReadyCallback, LocationEngi
 
         btn_done.setOnClickListener {
             val intent = Intent()
-            intent.putExtra("address", ""+et_search_query.text.toString().trim())
+            intent.putExtra("address", "" + et_search_query.text.toString().trim())
             setResult(102, intent)
             finish()
         }
@@ -174,6 +212,23 @@ class MapinIndiaActivity : AppCompatActivity(), OnMapReadyCallback, LocationEngi
     //    initMarker(28.4595, 77.0266)
         initMarker(26.8467, 80.92313)
 
+        listOfLatlang.add(LatLng(28.703900, 77.101318))
+        listOfLatlang.add(LatLng(28.703331, 77.102155))
+        listOfLatlang.add(LatLng(28.703905, 77.102761))
+        listOfLatlang.add(LatLng(28.704248, 77.102370))
+
+        setPolygon(listOfLatlang)
+        /*listOfLatlang2.add(LatLng(28.703901, 77.101319))
+        listOfLatlang2.add(LatLng(28.703332, 77.102156))
+        listOfLatlang2.add(LatLng(28.703906, 77.102762))
+        listOfLatlang2.add(LatLng(28.704249, 77.102371))
+        setPolygon(listOfLatlang2)
+*/
+        mapboxMap?.setOnPolygonClickListener {
+            Log.d("*** POLYGON CLICKED 1>>>>", ""+it.points)
+            Log.d("*** POLYGON CLICKED 2>>>>", ""+it.holes)
+            Log.d("*** POLYGON CLICKED 3>>>>", ""+it.id)
+        }
     }
 
     private fun initMarker(latitude: Double, longitude: Double){
@@ -264,7 +319,7 @@ class MapinIndiaActivity : AppCompatActivity(), OnMapReadyCallback, LocationEngi
     override fun onMapError(p0: Int, p1: String?) {
     }
 
-    override fun onStart() {
+  override fun onStart() {
         super.onStart()
         mapview.onStart()
     }
@@ -299,6 +354,7 @@ class MapinIndiaActivity : AppCompatActivity(), OnMapReadyCallback, LocationEngi
         mapview.onSaveInstanceState(outState)
     }
 
+
     override fun onConnected() {
         Log.d("*** onConnected = ", "true")
     }
@@ -311,7 +367,10 @@ class MapinIndiaActivity : AppCompatActivity(), OnMapReadyCallback, LocationEngi
         MapmyIndiaTextSearch.builder()
             .query(searchString)
             .build().enqueueCall(object : Callback<AutoSuggestAtlasResponse> {
-                override fun onResponse(call: Call<AutoSuggestAtlasResponse>, response: Response<AutoSuggestAtlasResponse>) {
+                override fun onResponse(
+                    call: Call<AutoSuggestAtlasResponse>,
+                    response: Response<AutoSuggestAtlasResponse>
+                ) {
                     if (response.code() == 200) {
                         if (response.body() != null) {
                             val suggestedList = response.body()?.suggestedLocations
@@ -324,13 +383,18 @@ class MapinIndiaActivity : AppCompatActivity(), OnMapReadyCallback, LocationEngi
                                         latitude = it.latitude.toDouble()
                                     )
                                 }
-                                showRecentPlaces(recentPlaces?: arrayListOf())
+                                showRecentPlaces(recentPlaces ?: arrayListOf())
                             }
                         } else {
-                            Toast.makeText(this@MapinIndiaActivity, "Not able to get value, Try again.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                this@MapinIndiaActivity,
+                                "Not able to get value, Try again.",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 }
+
                 override fun onFailure(call: Call<AutoSuggestAtlasResponse>, t: Throwable) {
                     showToast(t.toString())
                 }
@@ -341,5 +405,15 @@ class MapinIndiaActivity : AppCompatActivity(), OnMapReadyCallback, LocationEngi
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
+    /*override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(requestCode == 102) {
+            if(resultCode == Activity.RESULT_OK) {
+         //       val eLocation : ELocation = Gson().fromJson(data?.getStringExtra(PlaceConstants.RETURNING_ELOCATION_DATA), ELocation::class.java)
 
+                //Log.d("*** eloc = ", ""+eLocation)
+            }
+        }
+    }
+*/
 }

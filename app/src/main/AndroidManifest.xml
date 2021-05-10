@@ -23,8 +23,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".form.FormActivity" />
-        <activity android:name=".mapmyindia.MapinIndiaActivity" />
 
+        <activity android:name=".mapBuilder.MapinIndiaActivity"/>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/map_api" />

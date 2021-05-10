@@ -1,10 +1,9 @@
 package com.example.daytonaassignment.di.modules
 
+import com.example.daytonaassignment.mapBuilder.MapinIndiaActivity
 import com.example.daytonaassignment.form.FormActivity
-import com.example.daytonaassignment.form.MapFragment
 import com.example.daytonaassignment.form.di.MapVMInjection
-import com.example.daytonaassignment.mapmyindia.MapinIndiaActivity
-import com.example.daytonaassignment.mapmyindia.di.VMInjection
+import com.example.daytonaassignment.mapBuilder.di.VMInjection
 import com.example.daytonaassignment.maps.MainActivity
 import com.example.daytonaassignment.maps.di.DataModule
 import dagger.Module

@@ -2,18 +2,14 @@ package com.example.daytonaassignment.form
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.example.daytonaassignment.R
 import com.example.daytonaassignment.Utilities
-import com.example.daytonaassignment.mapmyindia.MapinIndiaVM
 import com.example.daytonaassignment.maps.RecentSearchAdapter
 import com.example.daytonaassignment.maps.TextListItem
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
@@ -34,12 +30,10 @@ import com.mmi.services.api.textsearch.MapmyIndiaTextSearch
 import kotlinx.android.synthetic.main.activity_mapin_india.btn_mipsearch
 import kotlinx.android.synthetic.main.activity_mapin_india.et_search_query
 import kotlinx.android.synthetic.main.activity_mapin_india.rv_recent_mip_search_list
-import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.android.synthetic.main.fragment_map.view.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import javax.inject.Inject
 
 
 class MapFragment : Fragment(), OnMapReadyCallback {

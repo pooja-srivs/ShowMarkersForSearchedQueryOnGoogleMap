@@ -1,6 +1,6 @@
 package com.example.daytonaassignment.data.remote.sources
 
-import com.example.daytonaassignment.mapmyindia.MapinIndiaModel
+import com.example.daytonaassignment.mapBuilder.MapinIndiaModel
 import io.reactivex.Single
 import retrofit2.http.GET
 import retrofit2.http.Query

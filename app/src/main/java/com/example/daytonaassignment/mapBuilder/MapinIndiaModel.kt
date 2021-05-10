@@ -1,6 +1,4 @@
-package com.example.daytonaassignment.mapmyindia
-
-import android.location.Address
+package com.example.daytonaassignment.mapBuilder
 
 data class MapinIndiaModel (
     val suggestedLocations : ArrayList<SuggestedLocations>

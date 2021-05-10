@@ -5,8 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import com.example.daytonaassignment.R
-import com.example.daytonaassignment.mapmyindia.MapinIndiaActivity
-import com.example.daytonaassignment.mapmyindia.MapinIndiaVM
+import com.example.daytonaassignment.mapBuilder.MapinIndiaActivity
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_form.*
 import kotlinx.android.synthetic.main.activity_option.*

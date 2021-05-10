@@ -21,7 +21,6 @@ import com.example.daytonaassignment.Utilities
 import com.example.daytonaassignment.data.remote.sources.SearchDataModel
 import com.example.daytonaassignment.form.FormActivity
 import com.example.daytonaassignment.form.OptionActivity
-import com.example.daytonaassignment.mapmyindia.MapinIndiaActivity
 import com.example.daytonaassignment.maps.di.RecentSearchListItem
 import com.example.daytonaassignment.maps.di.UserPlaceAdapter
 import com.google.android.gms.location.*

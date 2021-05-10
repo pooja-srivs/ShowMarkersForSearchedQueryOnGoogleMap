@@ -4,7 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.daytonaassignment.R
-import com.example.daytonaassignment.mapmyindia.MapinIndiaActivity
+import com.example.daytonaassignment.mapBuilder.MapinIndiaActivity
 import kotlinx.android.synthetic.main.activity_form.*
 import kotlinx.android.synthetic.main.activity_option.*
 import kotlinx.android.synthetic.main.activity_option.btn_activity_intent
